@@ -14,7 +14,10 @@ module RailsERD
         def polymorphic_from_models(domain, models)
           models.collect(&:reflect_on_all_associations).flatten.collect { |association|
             [association.options[:as].to_s.classify, association.active_record.name] if association.options[:as]
-          }.compact.uniq.collect { |names|
+          }.compact.uniq.select{ |names|
+            not domain.entity_by_name(names.last).nil?
+          }.collect { |names|
+
             new(domain, domain.entity_by_name(names.first), domain.entity_by_name(names.last))
           }
         end
